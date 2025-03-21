@@ -276,9 +276,10 @@ pharmacy_regulations = {
     },
     "Study System & Course Registration": {
         "Article 4": "The program spans five years of coursework plus one internship year.",
-        "Article 5": "A student must complete 300 hours of internship training before graduation.",
+        "Article 5": "A student must complete 100 hours of internship training before graduation.",
         "Article 6": "Each academic year includes two semesters (15 weeks each) with an optional summer term.",
-        "Article 7": "Maximum 21 credit hours per semester; course withdrawal is allowed within deadlines."
+        "Article 7": "Maximum 21 credit hours per semester; course withdrawal is allowed within deadlines.",
+        "Article 22": "Student couldn't register ant course without finishing all its prerequisites"
     },
     "Attendance & Language of Instruction": {
         "Article 8": "Students must attend at least 65% of classes to qualify for final exams.",
@@ -320,9 +321,7 @@ Inputs You Have:
         
 2. University Regulations summairzed into dictionary {pharmacy_regulations}
 
-Now, you have the following details for a student. The student registed {student_selected_courses} courses. 
-The student's CGPA is {cgpa}. The student asked you about what courses should be registed so that doesn't conflict with university Regulations 
-and doesn't affect the student's success.
+Now, you have the following details for a student. The student registed {student_selected_courses} courses. The student's CGPA is {cgpa}. The student asked you about what courses should be registed so that doesn't conflict with university regulations and doesn't affect the student's success.
 '''
 
 def guide_me():
