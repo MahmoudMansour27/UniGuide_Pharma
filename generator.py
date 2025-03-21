@@ -1,6 +1,5 @@
 from google import genai
 from pydantic import BaseModel
-import pandas as pd
 
 
 # parameters
