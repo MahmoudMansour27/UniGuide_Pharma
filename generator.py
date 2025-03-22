@@ -210,7 +210,15 @@ and doesn't affect the student's success.
 
 #Your Response structure should be {response_structure} as a JSON file.
 
-
-
 #res = get_response(prompt)
+
+# chat
+chat = client.chats.create(model='gemini-2.0-flash')
+def chat_message(msg):
+    response = chat.send_message(
+            message=msg
+        )
+    return response.text
+
+#print(chat_message('tell me 5 Egyptain male names').text)
 

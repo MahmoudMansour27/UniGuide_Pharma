@@ -1,5 +1,6 @@
 import streamlit as st
-from generator import get_response
+from generator import get_response, chat_message
+import time
  
 # background
 st.image('./assets/streamlit background  UniGuid.png')
@@ -153,13 +154,6 @@ semester_10_selected = st.pills('s10', options= semester_10, selection_mode="mul
 
 student_selected_courses = semester_1_selected + semester_2_selected + semester_3_selected + semester_4_selected + semester_5_selected + semester_6_selected + semester_7_selected + semester_8_selected + semester_9_selected + semester_10_selected
 
-# CGPA input
-st.header('Please enter your CGPA')
-cgpa = st.number_input('Enter you CGPA', min_value=0.0, max_value=4.0)
-
-# Additional Notes
-st.header('If you have any additional notes')
-st.text_area('Enter your notes here')
 
 # prompt
 pharmacy_courses = {
@@ -279,7 +273,8 @@ pharmacy_regulations = {
         "Article 5": "A student must complete 100 hours of internship training before graduation.",
         "Article 6": "Each academic year includes two semesters (15 weeks each) with an optional summer term.",
         "Article 7": "Maximum 21 credit hours per semester; course withdrawal is allowed within deadlines.",
-        "Article 22": "Student couldn't register ant course without finishing all its prerequisites"
+        "Article 22": "Student couldn't register any course without finishing all its prerequisites",
+        "Article 23": "If the student doesn't meet the couses requirements, then should first register the requirements on next semester"
     },
     "Attendance & Language of Instruction": {
         "Article 8": "Students must attend at least 65% of classes to qualify for final exams.",
@@ -307,6 +302,15 @@ pharmacy_regulations = {
     }
 }
 
+# CGPA input
+st.header('Please enter your CGPA')
+cgpa = st.number_input('Enter you CGPA', min_value=0.0, max_value=4.0)
+print(cgpa)
+
+# Additional Notes
+st.header('If you have any additional notes')
+st.text_area('Enter your notes here')
+
 prompt = f'''
 You are an academic advisor helping a university student with course registration. 
 Your task is to analyze the student's academic history and provide a personalized list of courses they should register for the upcoming semester.
@@ -321,7 +325,14 @@ Inputs You Have:
         
 2. University Regulations summairzed into dictionary {pharmacy_regulations}
 
-Now, you have the following details for a student. The student registed {student_selected_courses} courses. The student's CGPA is {cgpa}. The student asked you about what courses should be registed so that doesn't conflict with university regulations and doesn't affect the student's success.
+Now, you have the following details for a student. The student registed {student_selected_courses} courses only. The student's CGPA is {cgpa}. The student asked you about what courses should be registed so that doesn't conflict with the university regulations. Based on the student CGPA and completed courses do the following:
+1. If the CGPA is below 2 then the student could register 12 cridet hours only
+2. If the CGPA is above 2 then do the following:
+    2.1 Check the completed courses
+    2.2 Check the courses should be registered:
+        2.2.2 if the student completed all its prerequisites then the student can register the course
+        2.2.2 if the student doesn't meet all course prerequisites then the student cannot register the course and should finish the prerequisites first. So, the student will register the prerequisites in the next semester and the the next courses with completed prerequisites only.
+3.If the student haven't registered any courses yet, then should register courses in semester one regarless the student's CGPA
 '''
 
 def guide_me():
@@ -347,6 +358,52 @@ st.markdown('---')
 st.header('Here is your Guide 🤓️')
 
 results_container = st.container()
+
+
+
+# Sidebar
+def response_generator(prompt):
+    response = chat_message(prompt)
+    for word in response.split():
+        yield word + " "
+        time.sleep(0.05)
+        
+
+with st.sidebar:
+    st.title('UniGuide Chat 🤖️')
+    
+    # containers
+    messages_container = st.container()
+    chat_input_container = st.container()
+    
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    
+        
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        with messages_container.chat_message(message["role"]):
+            messages_container.markdown(message["content"])
+    
+    # Accept user input
+    if prompt_sbar := chat_input_container.chat_input("What is up?"):
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": prompt_sbar})
+        # Display user message in chat message container
+        with messages_container.chat_message("user"):
+            messages_container.markdown(prompt_sbar)
+    
+        # Display assistant response in chat message container
+        with messages_container.chat_message("assistant"):
+            response = messages_container.write_stream(response_generator(prompt_sbar))
+        # Add assistant response to chat history
+        st.session_state.messages.append({"role": "assistant", "content": response})
+    
+    
+        
+    
+        
 
 
 
